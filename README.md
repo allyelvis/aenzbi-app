@@ -1,4 +1,4 @@
-# AENZBi Business Management System and POS App
+# AENZBiApp
 
 ## Overview
 
@@ -20,12 +20,12 @@ AENZBi is a mobile business management and POS system built with React Native. I
 - React Native CLI
 - Java Development Kit (JDK) for Android development
 
-### Frontend Setup
+### Installation
 
 1. **Clone the repository**
 
     ```bash
-    git clone https://github.com/your-repository/aenzbi-app.git
+    git clone https://github.com/allyelvis/aenzbi-app.git
     cd aenzbi-app
     ```
 
@@ -46,81 +46,6 @@ AENZBi is a mobile business management and POS system built with React Native. I
     npx react-native run-ios      # For iOS (requires macOS)
     ```
 
-### Backend Setup
-
-1. **Navigate to the backend directory**
-
-    ```bash
-    cd backend
-    ```
-
-2. **Install dependencies**
-
-    ```bash
-    npm install
-    ```
-
-3. **Run the server**
-
-    ```bash
-    node server.js
-    ```
-
-### Deployment Instructions
-
-To deploy the backend server:
-
-1. **Create a Droplet on DigitalOcean**
-
-    - Create a new Droplet and point your domain `server.aenzbi.bi` to the Droplet's IP address using an A record.
-
-2. **Access Your Droplet**
-
-    ```bash
-    ssh root@your_droplet_ip
-    ```
-
-3. **Setup Environment on Droplet**
-
-    ```bash
-    apt update
-    apt install -y nodejs npm
-    ```
-
-4. **Clone Backend Repository**
-
-    ```bash
-    git clone https://github.com/your-repository/aenzbi-backend.git
-    cd aenzbi-backend
-    npm install
-    ```
-
-5. **Run Your Server**
-
-    ```bash
-    node server.js
-    ```
-
-6. **Keep Server Running**
-
-    ```bash
-    npm install -g pm2
-    pm2 start server.js
-    pm2 startup
-    pm2 save
-    ```
-
-### Environment Variables
-
-- `YOUR_BEARER_TOKEN`: Replace this with the actual token you plan to use for authentication in `server.js`.
-
-### Endpoints
-
-- **Sales Endpoint**: `http://server.aenzbi.bi/sales`
-- **Stock Endpoint**: `http://server.aenzbi.bi/stocks`
-
-Replace `http://server.aenzbi.bi` with the actual URL of your backend server.
-
 ### Project Structure
 
 ```bash
@@ -130,10 +55,9 @@ AENZBiApp/
 │   └── images/
 │       └── logo.png
 │
-├── backend/
-│   ├── node_modules/
-│   ├── package.json
-│   └── server.js
+├── modules/
+│   ├── initSales.js
+│   └── initStock.js
 │
 ├── screens/
 │   ├── HomeScreen.js
@@ -141,5 +65,16 @@ AENZBiApp/
 │   └── StockScreen.js
 │
 ├── App.js
+├── runner.js
+├── index.js
 ├── package.json
 └── README.md
+```
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For any inquiries, please contact us at support@aenzbi.com.

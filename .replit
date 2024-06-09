@@ -1,0 +1,8 @@
+run = "node server.js"
+modules = ["nodejs-20"]
+
+[nix]
+channel = "stable-23_11"
+
+[deployment]
+run = ["sh", "-c", "node server.js"]
