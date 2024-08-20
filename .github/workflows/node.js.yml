@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js CI and Deploy to GitHub Pages
 
 on:
   push:
@@ -20,11 +20,14 @@ jobs:
         node-version: 20.12.2
         cache: 'npm'
 
+    - name: Clean previous build
+      run: rm -rf build
+
     - name: Install dependencies
       run: npm ci
 
     - name: Build the project
-      run: npm run build --if-present
+      run: npm run build
 
     - name: Run tests
       run: npm test
@@ -63,5 +66,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Deploy application
-      run: npm run deploy --if-present
+    - name: Deploy to GitHub Pages
+      run: |
+        npm run build
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git add -f build
+        git commit -m "Deploy to GitHub Pages"
+        git push origin `git subtree split --prefix build main`:gh-pages --force
