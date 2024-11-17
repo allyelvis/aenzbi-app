@@ -1,26 +1,26 @@
-r# AENZBiApp
+# AENZBiApp
 
-## Overview
+# Overview
 
 AENZBi is a mobile business management and POS system built with React Native. It allows real-time sales invoice transactions and stock movement transactions, synchronized with an external endpoint using POST method and Bearer token authentication.
 
-## Features
+# Features
 
 - Real-time sales invoice transactions
 - Real-time stock movement transactions
 - Bearer token authentication
 - Integration with external endpoints
 
-## Setup Instructions
+# Setup Instructions
 
-### Prerequisites
+# Prerequisites
 
 - Node.js
 - npm
 - React Native CLI
 - Java Development Kit (JDK) for Android development
 
-### Installation
+# Installation
 
 1. **Clone the repository**
 
@@ -46,7 +46,7 @@ AENZBi is a mobile business management and POS system built with React Native. I
     npx react-native run-ios      # For iOS (requires macOS)
     ```
 
-### Project Structure
+# Project Structure
 
 ```bash
 AENZBiApp/
@@ -71,7 +71,7 @@ AENZBiApp/
 └── README.md
 ```
 
-## License
+# License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
