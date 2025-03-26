@@ -1,48 +1,3 @@
-#!/bin/bash
-
-# Function to create a file with content
-create_file() {
-  local file_path="$1"
-  local content="$2"
-  echo "$content" > "$file_path"
-  echo "Created $file_path"
-}
-
-# Set up project directories
-FRONTEND_DIR="AENZBiApp"
-BACKEND_DIR="server.aenzbi.bi"
-
-# Create and initialize React Native app
-npx react-native init $FRONTEND_DIR
-
-# Navigate to the frontend project directory
-cd $FRONTEND_DIR
-
-# Create directories
-mkdir -p assets/images modules screens
-
-# Create runner.js
-RUNNER_JS=$(cat <<EOL
-import { initSales } from './modules/initSales';
-import { initStock } from './modules/initStock';
-
-const initModules = () => {
-  initSales();
-  initStock();
-};
-
-const runApp = () => {
-  import('./App').then(({ default: App }) => {
-    App();
-  });
-};
-
-const run = () => {
-  initModules();
-  runApp();
-};
-
-run();
 EOL
 )
 create_file "runner.js" "$RUNNER_JS"
@@ -61,7 +16,7 @@ create_file "modules/initSales.js" "$INIT_SALES_JS"
 INIT_STOCK_JS=$(cat <<EOL
 export const initStock = () => {
   console.log('Stock module initialized');
-  // Add any stock module initialization logic here
+   // Add any stock module initialization logic here
 };
 EOL
 )

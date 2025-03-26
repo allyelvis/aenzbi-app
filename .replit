@@ -1,8 +1,26 @@
-run = "node server.js"
-modules = ["nodejs-20"]
+run = "node index.js"
+modules = ["nodejs-20", "python-3.10"]
 
 [nix]
 channel = "stable-23_11"
 
 [deployment]
-run = ["sh", "-c", "node server.js"]
+run = ["sh", "-c", "node index.js"]
+
+[[ports]]
+localPort = 3000
+
+[[ports]]
+localPort = 34119
+externalPort = 3002
+exposeLocalhost = true
+
+[[ports]]
+localPort = 34329
+externalPort = 3000
+exposeLocalhost = true
+
+[[ports]]
+localPort = 40031
+externalPort = 3001
+exposeLocalhost = true
