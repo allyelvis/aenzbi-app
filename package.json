@@ -1,4 +1,23 @@
 {
+  "name": "aenzbi-app",
+  "version": "1.2.0",
+  "description": "aenzbi app ",
+  "homepage": "https://github.com/allyelvis/aenzbi-app#readme",
+  "bugs": {
+    "url": "https://github.com/allyelvis/aenzbi-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/allyelvis/aenzbi-app.git"
+  },
+  "license": "MIT",
+  "author": "Ally Elvis Nzeyimana",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^6.1.17",
@@ -13,5 +32,6 @@
     "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-native": "^0.74.2"
-  }
+  },
+  "devDependencies": {}
 }
