@@ -20,7 +20,7 @@ import type {
   NativeModuleBaseTypeAnnotation,
   NativeModuleEnumDeclaration,
   NativeModuleEnumMap,
-  NativeModuleFloatTypeAnnotation,
+  FloatTypeAnnotation,
   NativeModuleFunctionTypeAnnotation,
   NativeModuleGenericObjectTypeAnnotation,
   NativeModuleMixedTypeAnnotation,
@@ -368,9 +368,7 @@ function emitObject(
   });
 }
 
-function emitFloat(
-  nullable: boolean,
-): Nullable<NativeModuleFloatTypeAnnotation> {
+function emitFloat(nullable: boolean): Nullable<FloatTypeAnnotation> {
   return wrapNullable(nullable, {
     type: 'FloatTypeAnnotation',
   });
@@ -468,6 +466,9 @@ function translateArrayTypeAnnotation(
   } catch (ex) {
     return wrapNullable(nullable, {
       type: 'ArrayTypeAnnotation',
+      elementType: {
+        type: 'AnyTypeAnnotation',
+      },
     });
   }
 }
@@ -603,6 +604,7 @@ function emitCommonTypes(
     typeAnnotation.type,
   );
 
+  // $FlowFixMe[invalid-computed-prop]
   const simpleEmitter = typeMap[typeAnnotationName];
   if (simpleEmitter) {
     return simpleEmitter(nullable);
@@ -611,6 +613,7 @@ function emitCommonTypes(
   const genericTypeAnnotationName =
     parser.getTypeAnnotationName(typeAnnotation);
 
+  // $FlowFixMe[invalid-computed-prop]
   const emitter = typeMap[genericTypeAnnotationName];
   if (!emitter) {
     return null;

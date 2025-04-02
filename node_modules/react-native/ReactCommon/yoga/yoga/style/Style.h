@@ -223,20 +223,38 @@ class YG_EXPORT Style {
     return computePosition(flexStartEdge(axis), direction).isDefined();
   }
 
+  bool isFlexStartPositionAuto(FlexDirection axis, Direction direction) const {
+    return computePosition(flexStartEdge(axis), direction).isAuto();
+  }
+
   bool isInlineStartPositionDefined(FlexDirection axis, Direction direction)
       const {
     return computePosition(inlineStartEdge(axis, direction), direction)
         .isDefined();
   }
 
+  bool isInlineStartPositionAuto(FlexDirection axis, Direction direction)
+      const {
+    return computePosition(inlineStartEdge(axis, direction), direction)
+        .isAuto();
+  }
+
   bool isFlexEndPositionDefined(FlexDirection axis, Direction direction) const {
     return computePosition(flexEndEdge(axis), direction).isDefined();
+  }
+
+  bool isFlexEndPositionAuto(FlexDirection axis, Direction direction) const {
+    return computePosition(flexEndEdge(axis), direction).isAuto();
   }
 
   bool isInlineEndPositionDefined(FlexDirection axis, Direction direction)
       const {
     return computePosition(inlineEndEdge(axis, direction), direction)
         .isDefined();
+  }
+
+  bool isInlineEndPositionAuto(FlexDirection axis, Direction direction) const {
+    return computePosition(inlineEndEdge(axis, direction), direction).isAuto();
   }
 
   float computeFlexStartPosition(
@@ -428,11 +446,9 @@ class YG_EXPORT Style {
         computeInlineEndMargin(axis, Direction::LTR, widthSize);
   }
 
-  float computeGapForAxis(FlexDirection axis) const {
+  float computeGapForAxis(FlexDirection axis, float ownerSize) const {
     auto gap = isRow(axis) ? computeColumnGap() : computeRowGap();
-    // TODO: Validate percentage gap, and expose ability to set percentage to
-    // public API
-    return maxOrDefined(gap.resolve(0.0f /*ownerSize*/).unwrap(), 0.0f);
+    return maxOrDefined(gap.resolve(ownerSize).unwrap(), 0.0f);
   }
 
   bool flexStartMarginIsAuto(FlexDirection axis, Direction direction) const {

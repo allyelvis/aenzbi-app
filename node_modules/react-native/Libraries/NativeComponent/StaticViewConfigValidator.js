@@ -22,11 +22,6 @@ export type Difference =
       path: Array<string>,
       nativeValue: mixed,
       staticValue: mixed,
-    }
-  | {
-      type: 'unexpected',
-      path: Array<string>,
-      staticValue: mixed,
     };
 
 export type ValidationResult = ValidResult | InvalidResult;
@@ -90,8 +85,6 @@ export function stringifyValidationResult(
           return `- '${path.join('.')}' is missing.`;
         case 'unequal':
           return `- '${path.join('.')}' is the wrong value.`;
-        case 'unexpected':
-          return `- '${path.join('.')}' is present but not expected to be.`;
       }
     }),
     '',
@@ -105,6 +98,7 @@ function accumulateDifferences(
   staticObject: {...},
 ): void {
   for (const nativeKey in nativeObject) {
+    // $FlowFixMe[invalid-computed-prop]
     const nativeValue = nativeObject[nativeKey];
 
     if (!staticObject.hasOwnProperty(nativeKey)) {
@@ -116,6 +110,7 @@ function accumulateDifferences(
       continue;
     }
 
+    // $FlowFixMe[invalid-computed-prop]
     const staticValue = staticObject[nativeKey];
 
     const nativeValueIfObject = ifObject(nativeValue);
@@ -140,19 +135,6 @@ function accumulateDifferences(
         type: 'unequal',
         nativeValue,
         staticValue,
-      });
-    }
-  }
-
-  for (const staticKey in staticObject) {
-    if (
-      !nativeObject.hasOwnProperty(staticKey) &&
-      !isIgnored(staticObject[staticKey])
-    ) {
-      differences.push({
-        path: [...path, staticKey],
-        type: 'unexpected',
-        staticValue: staticObject[staticKey],
       });
     }
   }

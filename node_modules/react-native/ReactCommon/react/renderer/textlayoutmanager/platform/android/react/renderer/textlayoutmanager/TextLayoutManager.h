@@ -47,13 +47,7 @@ class TextLayoutManager {
       const AttributedStringBox& attributedStringBox,
       const ParagraphAttributes& paragraphAttributes,
       const TextLayoutContext& layoutContext,
-      LayoutConstraints layoutConstraints,
-      std::shared_ptr<void> /* hostTextStorage */) const;
-
-  std::shared_ptr<void> getHostTextStorage(
-      const AttributedString& attributedString,
-      const ParagraphAttributes& paragraphAttributes,
-      LayoutConstraints layoutConstraints) const;
+      const LayoutConstraints& layoutConstraints) const;
 
   /**
    * Measures an AttributedString on the platform, as identified by some
@@ -62,16 +56,25 @@ class TextLayoutManager {
   TextMeasurement measureCachedSpannableById(
       int64_t cacheId,
       const ParagraphAttributes& paragraphAttributes,
-      LayoutConstraints layoutConstraints) const;
+      const LayoutConstraints& layoutConstraints) const;
 
   /*
    * Measures lines of `attributedString` using native text rendering
    * infrastructure.
    */
   LinesMeasurements measureLines(
-      const AttributedString& attributedString,
+      const AttributedStringBox& attributedStringBox,
       const ParagraphAttributes& paragraphAttributes,
-      Size size) const;
+      const Size& size) const;
+
+  /*
+   * Calculates baseline of `attributedString` using native text rendering
+   * infrastructure.
+   */
+  Float baseline(
+      const AttributedStringBox& attributedStringBox,
+      const ParagraphAttributes& paragraphAttributes,
+      const Size& size) const;
 
   /*
    * Returns an opaque pointer to platform-specific TextLayoutManager.
@@ -81,23 +84,14 @@ class TextLayoutManager {
 
  private:
   TextMeasurement doMeasure(
-      AttributedString attributedString,
-      const ParagraphAttributes& paragraphAttributes,
-      LayoutConstraints layoutConstraints) const;
-
-  TextMeasurement doMeasureMapBuffer(
-      AttributedString attributedString,
-      const ParagraphAttributes& paragraphAttributes,
-      LayoutConstraints layoutConstraints) const;
-
-  LinesMeasurements measureLinesMapBuffer(
       const AttributedString& attributedString,
       const ParagraphAttributes& paragraphAttributes,
-      Size size) const;
+      const LayoutConstraints& layoutConstraints) const;
 
   void* self_{};
   ContextContainer::Shared contextContainer_;
-  TextMeasureCache measureCache_;
+  TextMeasureCache textMeasureCache_;
+  LineMeasureCache lineMeasureCache_;
 };
 
 } // namespace facebook::react

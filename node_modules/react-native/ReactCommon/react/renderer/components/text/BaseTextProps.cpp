@@ -91,6 +91,12 @@ static TextAttributes convertRawProp(
       "textTransform",
       sourceTextAttributes.textTransform,
       defaultTextAttributes.textTransform);
+  textAttributes.textAlignVertical = convertRawProp(
+      context,
+      rawProps,
+      "textAlignVertical",
+      sourceTextAttributes.textAlignVertical,
+      defaultTextAttributes.textAlignVertical);
 
   // Paragraph
   textAttributes.lineHeight = convertRawProp(
@@ -117,6 +123,12 @@ static TextAttributes convertRawProp(
       "lineBreakStrategyIOS",
       sourceTextAttributes.lineBreakStrategy,
       defaultTextAttributes.lineBreakStrategy);
+  textAttributes.lineBreakMode = convertRawProp(
+      context,
+      rawProps,
+      "lineBreakModeIOS",
+      sourceTextAttributes.lineBreakMode,
+      defaultTextAttributes.lineBreakMode);
 
   // Decoration
   textAttributes.textDecorationColor = convertRawProp(
@@ -266,6 +278,12 @@ void BaseTextProps::setProp(
         defaults,
         value,
         textAttributes,
+        textAlignVertical,
+        "textAlignVertical");
+    REBUILD_FIELD_SWITCH_CASE(
+        defaults,
+        value,
+        textAttributes,
         baseWritingDirection,
         "baseWritingDirection");
     REBUILD_FIELD_SWITCH_CASE(
@@ -274,6 +292,8 @@ void BaseTextProps::setProp(
         textAttributes,
         lineBreakStrategy,
         "lineBreakStrategyIOS");
+    REBUILD_FIELD_SWITCH_CASE(
+        defaults, value, textAttributes, lineBreakMode, "lineBreakModeIOS");
     REBUILD_FIELD_SWITCH_CASE(
         defaults,
         value,

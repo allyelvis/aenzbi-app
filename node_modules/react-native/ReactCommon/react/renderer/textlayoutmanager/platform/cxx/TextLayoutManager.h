@@ -36,31 +36,43 @@ class TextLayoutManager {
    * Measures `attributedStringBox` using native text rendering infrastructure.
    */
   virtual TextMeasurement measure(
-      AttributedStringBox attributedStringBox,
-      ParagraphAttributes paragraphAttributes,
+      const AttributedStringBox& attributedStringBox,
+      const ParagraphAttributes& paragraphAttributes,
       const TextLayoutContext& layoutContext,
-      LayoutConstraints layoutConstraints,
-      std::shared_ptr<void>) const;
+      const LayoutConstraints& layoutConstraints) const;
+
+  /**
+   * Measures an AttributedString on the platform, as identified by some
+   * opaque cache ID.
+   */
+  virtual TextMeasurement measureCachedSpannableById(
+      int64_t cacheId,
+      const ParagraphAttributes& paragraphAttributes,
+      const LayoutConstraints& layoutConstraints) const;
 
   /*
    * Measures lines of `attributedString` using native text rendering
    * infrastructure.
    */
   virtual LinesMeasurements measureLines(
-      AttributedString attributedString,
-      ParagraphAttributes paragraphAttributes,
-      Size size) const;
+      const AttributedStringBox& attributedStringBox,
+      const ParagraphAttributes& paragraphAttributes,
+      const Size& size) const;
+
+  /*
+   * Calculates baseline of `attributedString` using native text rendering
+   * infrastructure.
+   */
+  virtual Float baseline(
+      const AttributedStringBox& attributedStringBox,
+      const ParagraphAttributes& paragraphAttributes,
+      const Size& size) const;
 
   /*
    * Returns an opaque pointer to platform-specific TextLayoutManager.
    * Is used on a native views layer to delegate text rendering to the manager.
    */
   void* getNativeTextLayoutManager() const;
-
-  virtual std::shared_ptr<void> getHostTextStorage(
-      AttributedString attributedStringBox,
-      ParagraphAttributes paragraphAttributes,
-      LayoutConstraints layoutConstraints) const;
 };
 
 } // namespace facebook::react

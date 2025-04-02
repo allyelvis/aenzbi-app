@@ -54,7 +54,9 @@ static void jni_YGConfigSetExperimentalFeatureEnabledJNI(
     jboolean enabled) {
   const YGConfigRef config = _jlong2YGConfigRef(nativePointer);
   YGConfigSetExperimentalFeatureEnabled(
-      config, static_cast<YGExperimentalFeature>(feature), enabled);
+      config,
+      static_cast<YGExperimentalFeature>(feature),
+      static_cast<bool>(enabled));
 }
 
 static void jni_YGConfigSetUseWebDefaultsJNI(
@@ -63,7 +65,7 @@ static void jni_YGConfigSetUseWebDefaultsJNI(
     jlong nativePointer,
     jboolean useWebDefaults) {
   const YGConfigRef config = _jlong2YGConfigRef(nativePointer);
-  YGConfigSetUseWebDefaults(config, useWebDefaults);
+  YGConfigSetUseWebDefaults(config, static_cast<bool>(useWebDefaults));
 }
 
 static void jni_YGConfigSetPointScaleFactorJNI(
@@ -161,7 +163,7 @@ static void jni_YGConfigSetLoggerJNI(
   auto context =
       reinterpret_cast<ScopedGlobalRef<jobject>*>(YGConfigGetContext(config));
 
-  if (logger) {
+  if (logger != nullptr) {
     if (context == nullptr) {
       context = new ScopedGlobalRef<jobject>();
       YGConfigSetContext(config, context);
@@ -225,14 +227,15 @@ static void jni_YGNodeSetIsReferenceBaselineJNI(
     jlong nativePointer,
     jboolean isReferenceBaseline) {
   YGNodeSetIsReferenceBaseline(
-      _jlong2YGNodeRef(nativePointer), isReferenceBaseline);
+      _jlong2YGNodeRef(nativePointer), static_cast<bool>(isReferenceBaseline));
 }
 
 static jboolean jni_YGNodeIsReferenceBaselineJNI(
     JNIEnv* /*env*/,
     jobject /*obj*/,
     jlong nativePointer) {
-  return YGNodeIsReferenceBaseline(_jlong2YGNodeRef(nativePointer));
+  return static_cast<jboolean>(
+      YGNodeIsReferenceBaseline(_jlong2YGNodeRef(nativePointer)));
 }
 
 static void jni_YGNodeRemoveAllChildrenJNI(
@@ -340,7 +343,7 @@ static void jni_YGNodeCalculateLayoutJNI(
   try {
     PtrJNodeMapVanilla* layoutContext = nullptr;
     auto map = PtrJNodeMapVanilla{};
-    if (nativePointers) {
+    if (nativePointers != nullptr) {
       map = PtrJNodeMapVanilla{nativePointers, javaNodes};
       layoutContext = &map;
     }
@@ -356,7 +359,7 @@ static void jni_YGNodeCalculateLayoutJNI(
     YGTransferLayoutOutputsRecursive(env, obj, root);
   } catch (const YogaJniException& jniException) {
     ScopedLocalRef<jthrowable> throwable = jniException.getThrowable();
-    if (throwable.get()) {
+    if (throwable.get() != nullptr) {
       env->Throw(throwable.get());
     }
   } catch (const std::logic_error& ex) {
@@ -457,6 +460,14 @@ static void jni_YGNodeCopyStyleJNI(
         static_cast<float>(value));                                       \
   }
 
+#define YG_NODE_JNI_STYLE_EDGE_UNIT_PROP_AUTO(name)                       \
+  YG_NODE_JNI_STYLE_EDGE_UNIT_PROP(name)                                  \
+  static void jni_YGNodeStyleSet##name##AutoJNI(                          \
+      JNIEnv* /*env*/, jobject /*obj*/, jlong nativePointer, jint edge) { \
+    YGNodeStyleSet##name##Auto(                                           \
+        _jlong2YGNodeRef(nativePointer), static_cast<YGEdge>(edge));      \
+  }
+
 YG_NODE_JNI_STYLE_PROP(jint, YGDirection, Direction);
 YG_NODE_JNI_STYLE_PROP(jint, YGFlexDirection, FlexDirection);
 YG_NODE_JNI_STYLE_PROP(jint, YGJustify, JustifyContent);
@@ -479,7 +490,7 @@ YG_NODE_JNI_STYLE_UNIT_PROP_AUTO(Height);
 YG_NODE_JNI_STYLE_UNIT_PROP(MinHeight);
 YG_NODE_JNI_STYLE_UNIT_PROP(MaxHeight);
 
-YG_NODE_JNI_STYLE_EDGE_UNIT_PROP(Position);
+YG_NODE_JNI_STYLE_EDGE_UNIT_PROP_AUTO(Position);
 
 static jlong jni_YGNodeStyleGetMarginJNI(
     JNIEnv* /*env*/,
@@ -626,8 +637,8 @@ static YGSize YGJNIMeasureFunc(
 
     uint32_t wBits = 0xFFFFFFFF & (measureResult >> 32);
     uint32_t hBits = 0xFFFFFFFF & measureResult;
-    float measuredWidth = std::bit_cast<float>(wBits);
-    float measuredHeight = std::bit_cast<float>(hBits);
+    auto measuredWidth = std::bit_cast<float>(wBits);
+    auto measuredHeight = std::bit_cast<float>(hBits);
 
     return YGSize{measuredWidth, measuredHeight};
   } else {
@@ -645,7 +656,7 @@ static void jni_YGNodeSetHasMeasureFuncJNI(
     jboolean hasMeasureFunc) {
   YGNodeSetMeasureFunc(
       _jlong2YGNodeRef(nativePointer),
-      hasMeasureFunc ? YGJNIMeasureFunc : nullptr);
+      static_cast<bool>(hasMeasureFunc) ? YGJNIMeasureFunc : nullptr);
 }
 
 static float YGJNIBaselineFunc(YGNodeConstRef node, float width, float height) {
@@ -669,7 +680,7 @@ static void jni_YGNodeSetHasBaselineFuncJNI(
     jboolean hasBaselineFunc) {
   YGNodeSetBaselineFunc(
       _jlong2YGNodeRef(nativePointer),
-      hasBaselineFunc ? YGJNIBaselineFunc : nullptr);
+      static_cast<bool>(hasBaselineFunc) ? YGJNIBaselineFunc : nullptr);
 }
 
 static void jni_YGNodeSetAlwaysFormsContainingBlockJNI(
@@ -678,7 +689,8 @@ static void jni_YGNodeSetAlwaysFormsContainingBlockJNI(
     jlong nativePointer,
     jboolean alwaysFormsContainingBlock) {
   YGNodeSetAlwaysFormsContainingBlock(
-      _jlong2YGNodeRef(nativePointer), alwaysFormsContainingBlock);
+      _jlong2YGNodeRef(nativePointer),
+      static_cast<bool>(alwaysFormsContainingBlock));
 }
 
 static jlong
@@ -706,6 +718,18 @@ static void jni_YGNodeStyleSetGapJNI(
     jint gutter,
     jfloat gapLength) {
   YGNodeStyleSetGap(
+      _jlong2YGNodeRef(nativePointer),
+      static_cast<YGGutter>(gutter),
+      static_cast<float>(gapLength));
+}
+
+static void jni_YGNodeStyleSetGapPercentJNI(
+    JNIEnv* /*env*/,
+    jobject /*obj*/,
+    jlong nativePointer,
+    jint gutter,
+    jfloat gapLength) {
+  YGNodeStyleSetGapPercent(
       _jlong2YGNodeRef(nativePointer),
       static_cast<YGGutter>(gutter),
       static_cast<float>(gapLength));
@@ -875,6 +899,9 @@ static JNINativeMethod methods[] = {
     {"jni_YGNodeStyleSetPositionPercentJNI",
      "(JIF)V",
      (void*)jni_YGNodeStyleSetPositionPercentJNI},
+    {"jni_YGNodeStyleSetPositionAutoJNI",
+     "(JI)V",
+     (void*)jni_YGNodeStyleSetPositionAutoJNI},
     {"jni_YGNodeStyleGetWidthJNI", "(J)J", (void*)jni_YGNodeStyleGetWidthJNI},
     {"jni_YGNodeStyleSetWidthJNI", "(JF)V", (void*)jni_YGNodeStyleSetWidthJNI},
     {"jni_YGNodeStyleSetWidthPercentJNI",
@@ -940,6 +967,9 @@ static JNINativeMethod methods[] = {
      (void*)jni_YGNodeSetHasMeasureFuncJNI},
     {"jni_YGNodeStyleGetGapJNI", "(JI)F", (void*)jni_YGNodeStyleGetGapJNI},
     {"jni_YGNodeStyleSetGapJNI", "(JIF)V", (void*)jni_YGNodeStyleSetGapJNI},
+    {"jni_YGNodeStyleSetGapPercentJNI",
+     "(JIF)V",
+     (void*)jni_YGNodeStyleSetGapPercentJNI},
     {"jni_YGNodeSetHasBaselineFuncJNI",
      "(JZ)V",
      (void*)jni_YGNodeSetHasBaselineFuncJNI},

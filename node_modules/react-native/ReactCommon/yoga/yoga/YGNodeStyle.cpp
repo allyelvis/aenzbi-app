@@ -205,6 +205,11 @@ void YGNodeStyleSetPositionPercent(YGNodeRef node, YGEdge edge, float percent) {
       node, scopedEnum(edge), value::percent(percent));
 }
 
+void YGNodeStyleSetPositionAuto(YGNodeRef node, YGEdge edge) {
+  updateStyle<&Style::position, &Style::setPosition>(
+      node, scopedEnum(edge), value::ofAuto());
+}
+
 YGValue YGNodeStyleGetPosition(YGNodeConstRef node, YGEdge edge) {
   return (YGValue)resolveRef(node)->style().position(scopedEnum(edge));
 }
@@ -265,6 +270,11 @@ void YGNodeStyleSetGap(
     const float gapLength) {
   updateStyle<&Style::gap, &Style::setGap>(
       node, scopedEnum(gutter), value::points(gapLength));
+}
+
+void YGNodeStyleSetGapPercent(YGNodeRef node, YGGutter gutter, float percent) {
+  updateStyle<&Style::gap, &Style::setGap>(
+      node, scopedEnum(gutter), value::percent(percent));
 }
 
 float YGNodeStyleGetGap(const YGNodeConstRef node, const YGGutter gutter) {

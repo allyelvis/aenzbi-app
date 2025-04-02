@@ -6,10 +6,12 @@
  */
 
 #import "RCTFontUtils.h"
+#import <CoreText/CoreText.h>
 
 #import <algorithm>
 #import <cmath>
 #import <limits>
+#import <map>
 #import <mutex>
 
 static RCTFontProperties RCTDefaultFontProperties()
@@ -62,8 +64,51 @@ static RCTFontStyle RCTGetFontStyle(UIFont *font)
 
 static NSArray *RCTFontFeatures(RCTFontVariant fontVariant)
 {
-  // FIXME:
-  return @[];
+  NSMutableArray *fontFeatures = [NSMutableArray array];
+  static std::map<RCTFontVariant, NSDictionary *> mapping;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    mapping = {
+        {RCTFontVariantSmallCaps, @{
+           UIFontFeatureTypeIdentifierKey : @(kLowerCaseType),
+           UIFontFeatureSelectorIdentifierKey : @(kLowerCaseSmallCapsSelector),
+         }},
+        {RCTFontVariantOldstyleNums, @{
+           UIFontFeatureTypeIdentifierKey : @(kNumberCaseType),
+           UIFontFeatureSelectorIdentifierKey : @(kLowerCaseNumbersSelector),
+         }},
+        {RCTFontVariantLiningNums, @{
+           UIFontFeatureTypeIdentifierKey : @(kNumberCaseType),
+           UIFontFeatureSelectorIdentifierKey : @(kUpperCaseNumbersSelector),
+         }},
+        {RCTFontVariantTabularNums, @{
+           UIFontFeatureTypeIdentifierKey : @(kNumberSpacingType),
+           UIFontFeatureSelectorIdentifierKey : @(kMonospacedNumbersSelector),
+         }},
+        {RCTFontVariantProportionalNums, @{
+           UIFontFeatureTypeIdentifierKey : @(kNumberSpacingType),
+           UIFontFeatureSelectorIdentifierKey : @(kProportionalNumbersSelector),
+         }},
+    };
+  });
+
+  if (fontVariant & RCTFontVariantSmallCaps) {
+    [fontFeatures addObject:mapping[RCTFontVariantSmallCaps]];
+  }
+  if (fontVariant & RCTFontVariantOldstyleNums) {
+    [fontFeatures addObject:mapping[RCTFontVariantOldstyleNums]];
+  }
+  if (fontVariant & RCTFontVariantLiningNums) {
+    [fontFeatures addObject:mapping[RCTFontVariantLiningNums]];
+  }
+  if (fontVariant & RCTFontVariantTabularNums) {
+    [fontFeatures addObject:mapping[RCTFontVariantTabularNums]];
+  }
+  if (fontVariant & RCTFontVariantProportionalNums) {
+    [fontFeatures addObject:mapping[RCTFontVariantProportionalNums]];
+  }
+
+  return fontFeatures;
 }
 
 static UIFont *RCTDefaultFontWithFontProperties(RCTFontProperties fontProperties)
@@ -72,7 +117,8 @@ static UIFont *RCTDefaultFontWithFontProperties(RCTFontProperties fontProperties
   static std::mutex fontCacheMutex;
 
   CGFloat effectiveFontSize = fontProperties.sizeMultiplier * fontProperties.size;
-  NSString *cacheKey = [NSString stringWithFormat:@"%.1f/%.2f", effectiveFontSize, fontProperties.weight];
+  NSString *cacheKey = [NSString
+      stringWithFormat:@"%.1f/%.2f/%ld", effectiveFontSize, fontProperties.weight, (long)fontProperties.style];
   UIFont *font;
 
   {
@@ -86,7 +132,7 @@ static UIFont *RCTDefaultFontWithFontProperties(RCTFontProperties fontProperties
   if (!font) {
     font = [UIFont systemFontOfSize:effectiveFontSize weight:fontProperties.weight];
 
-    if (fontProperties.variant == RCTFontStyleItalic) {
+    if (fontProperties.style == RCTFontStyleItalic) {
       UIFontDescriptor *fontDescriptor = [font fontDescriptor];
       UIFontDescriptorSymbolicTraits symbolicTraits = fontDescriptor.symbolicTraits;
 
