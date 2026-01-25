@@ -279,6 +279,9 @@ export const salesOrderItemsRelations = relations(salesOrderItems, ({ one }) => 
   }),
 }));
 
+// Export auth models
+export * from "./models/auth";
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
