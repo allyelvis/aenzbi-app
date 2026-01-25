@@ -1,5 +1,5 @@
 run = "npm run dev"
-modules = ["nodejs-20:v8-20230920-bd784b9"]
+modules = ["nodejs-20:v8-20230920-bd784b9", "python-3.10"]
 hidden = [".config", "package-lock.json"]
 entrypoint = "index.html"
 
@@ -17,3 +17,39 @@ publicDir = "dist"
 [[ports]]
 localPort = 5173
 externalPort = 80
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[auth]
+pageEnabled = true
+buttonEnabled = false
+
+[agent]
+expertMode = true
+integrations = ["javascript_database:1.0.0"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "ERP Server"
+
+[[workflows.workflow]]
+name = "ERP Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
