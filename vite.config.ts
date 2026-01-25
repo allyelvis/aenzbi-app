@@ -1,12 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   plugins: [react()],
-  root: "client",
+  root: path.resolve(__dirname, "client"),
   build: {
-    outDir: "../dist",
+    outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
   },
   resolve: {
@@ -18,7 +22,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
