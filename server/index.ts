@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
 
 const app = express();
 app.use(express.json());
@@ -38,6 +39,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  await setupAuth(app);
+  registerAuthRoutes(app);
   registerRoutes(app);
 
   const server = createServer(app);

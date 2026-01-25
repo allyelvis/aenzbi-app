@@ -1,7 +1,9 @@
 import type { Express } from "express";
 import { storage } from "./storage";
+import { registerSubscriptionRoutes } from "./subscriptionRoutes";
 
 export function registerRoutes(app: Express) {
+  registerSubscriptionRoutes(app);
   // Dashboard
   app.get("/api/dashboard", async (req, res) => {
     try {

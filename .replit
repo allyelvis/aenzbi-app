@@ -28,7 +28,7 @@ buttonEnabled = false
 
 [agent]
 expertMode = true
-integrations = ["javascript_database:1.0.0"]
+integrations = ["javascript_database:1.0.0", "javascript_log_in_with_replit:2.0.0"]
 
 [workflows]
 runButton = "Project"
