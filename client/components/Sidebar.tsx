@@ -12,10 +12,11 @@ import {
   Building2,
   Crown,
   LogOut,
+  Store,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
-type PageType = "dashboard" | "customers" | "products" | "sales" | "leads" | "expenses" | "tasks" | "inventory" | "reports" | "subscription";
+type PageType = "dashboard" | "customers" | "products" | "sales" | "leads" | "expenses" | "tasks" | "inventory" | "reports" | "subscription" | "pos";
 
 interface User {
   id: string;
@@ -34,6 +35,7 @@ interface SidebarProps {
 
 const menuItems: { id: PageType; label: string; icon: React.ComponentType<any> }[] = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "pos", label: "Point of Sale", icon: Store },
   { id: "customers", label: "Customers", icon: Users },
   { id: "products", label: "Products", icon: Package },
   { id: "sales", label: "Sales Orders", icon: ShoppingCart },

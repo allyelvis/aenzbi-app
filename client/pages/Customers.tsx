@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Mail, Phone, MapPin } from "lucide-react";
+import { Plus, Search, Mail, Phone, MapPin, Edit2 } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { formatCurrency } from "../lib/utils";
 
@@ -20,6 +20,7 @@ interface Customer {
 export default function Customers() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -46,18 +47,48 @@ export default function Customers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
-      setShowForm(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        city: "",
-        country: "",
-        segment: "regular",
-      });
+      closeForm();
     },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: typeof formData }) => {
+      const res = await apiRequest("PATCH", `/api/customers/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      closeForm();
+    },
+  });
+
+  const openEditForm = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setFormData({
+      name: customer.name,
+      email: customer.email || "",
+      phone: customer.phone || "",
+      address: customer.address || "",
+      city: customer.city || "",
+      country: customer.country || "",
+      segment: customer.segment || "regular",
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingCustomer(null);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      country: "",
+      segment: "regular",
+    });
+  };
 
   const filteredCustomers = customers.filter(
     (c) =>
@@ -95,11 +126,17 @@ export default function Customers() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add Customer</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {editingCustomer ? "Edit Customer" : "Add Customer"}
+            </h2>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                createMutation.mutate(formData);
+                if (editingCustomer) {
+                  updateMutation.mutate({ id: editingCustomer.id, data: formData });
+                } else {
+                  createMutation.mutate(formData);
+                }
               }}
               className="space-y-4"
             >
@@ -174,7 +211,7 @@ export default function Customers() {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={closeForm}
                   className="flex-1 px-4 py-2 border rounded-lg hover:bg-muted"
                 >
                   Cancel
@@ -183,7 +220,7 @@ export default function Customers() {
                   type="submit"
                   className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90"
                 >
-                  Save
+                  {editingCustomer ? "Update" : "Save"}
                 </button>
               </div>
             </form>
@@ -215,6 +252,12 @@ export default function Customers() {
                     {customer.segment}
                   </span>
                 </div>
+                <button
+                  onClick={() => openEditForm(customer)}
+                  className="p-2 hover:bg-muted rounded-lg transition"
+                >
+                  <Edit2 className="h-4 w-4 text-muted-foreground" />
+                </button>
               </div>
               <div className="space-y-2 text-sm text-muted-foreground">
                 {customer.email && (
