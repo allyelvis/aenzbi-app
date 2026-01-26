@@ -10,6 +10,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Jan 26, 2026**: Added edit functionality to Customers and Products modules
+- **Jan 26, 2026**: Added Point of Sale (POS) module for quick transactions with cart system
+- **Jan 26, 2026**: Added sample data (8 products, 5 customers) for testing
 - **Jan 25, 2026**: Added user authentication with Replit Auth (supports Google, GitHub, email login)
 - **Jan 25, 2026**: Implemented subscription tiers (Free, Starter, Professional, Enterprise)
 - **Jan 25, 2026**: Created landing page for unauthenticated users with pricing display
