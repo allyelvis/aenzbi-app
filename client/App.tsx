@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/use-auth";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
@@ -12,6 +12,8 @@ import Inventory from "./pages/Inventory";
 import Reports from "./pages/Reports";
 import Subscription from "./pages/Subscription";
 import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import GetStarted from "./pages/GetStarted";
 import POS from "./pages/POS";
 
 type PageType = "dashboard" | "customers" | "products" | "sales" | "leads" | "expenses" | "tasks" | "inventory" | "reports" | "subscription" | "pos";
@@ -19,6 +21,18 @@ type PageType = "dashboard" | "customers" | "products" | "sales" | "leads" | "ex
 export default function App() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const [currentPage, setCurrentPage] = useState<PageType>("dashboard");
+  const [publicPage, setPublicPage] = useState<"landing" | "login" | "get-started">("landing");
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === "/login") {
+      setPublicPage("login");
+    } else if (path === "/get-started") {
+      setPublicPage("get-started");
+    } else {
+      setPublicPage("landing");
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -29,6 +43,8 @@ export default function App() {
   }
 
   if (!isAuthenticated) {
+    if (publicPage === "login") return <Login />;
+    if (publicPage === "get-started") return <GetStarted />;
     return <Landing />;
   }
 

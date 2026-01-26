@@ -16,7 +16,7 @@ export default function Landing() {
               <a href="#features" className="text-slate-300 hover:text-white transition">Features</a>
               <a href="#pricing" className="text-slate-300 hover:text-white transition">Pricing</a>
               <a
-                href="/api/login"
+                href="/login"
                 className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition"
               >
                 Sign In
@@ -40,7 +40,7 @@ export default function Landing() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/api/login"
+              href="/get-started"
               className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white px-8 py-4 rounded-xl font-semibold text-lg transition shadow-lg shadow-emerald-500/25"
             >
               Get Started Free
@@ -123,7 +123,7 @@ export default function Landing() {
                   ))}
                 </ul>
                 <a
-                  href="/api/login"
+                  href="/get-started"
                   className={`block text-center py-2 rounded-lg font-medium transition ${
                     plan.popular
                       ? "bg-emerald-500 hover:bg-emerald-600 text-white"
