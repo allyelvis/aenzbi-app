@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Jan 26, 2026**: Added dedicated Login and Get Started pages with clean UI
 - **Jan 26, 2026**: Added edit functionality to Customers and Products modules
 - **Jan 26, 2026**: Added Point of Sale (POS) module for quick transactions with cart system
 - **Jan 26, 2026**: Added sample data (8 products, 5 customers) for testing
