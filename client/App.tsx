@@ -12,8 +12,9 @@ import Inventory from "./pages/Inventory";
 import Reports from "./pages/Reports";
 import Subscription from "./pages/Subscription";
 import Landing from "./pages/Landing";
+import POS from "./pages/POS";
 
-type PageType = "dashboard" | "customers" | "products" | "sales" | "leads" | "expenses" | "tasks" | "inventory" | "reports" | "subscription";
+type PageType = "dashboard" | "customers" | "products" | "sales" | "leads" | "expenses" | "tasks" | "inventory" | "reports" | "subscription" | "pos";
 
 export default function App() {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -53,6 +54,8 @@ export default function App() {
         return <Reports />;
       case "subscription":
         return <Subscription />;
+      case "pos":
+        return <POS />;
       default:
         return <Dashboard />;
     }

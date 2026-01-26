@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Package, AlertTriangle } from "lucide-react";
+import { Plus, Search, Package, AlertTriangle, Edit2 } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { formatCurrency } from "../lib/utils";
 
@@ -20,6 +20,7 @@ interface Product {
 export default function Products() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
     sku: "",
@@ -47,19 +48,50 @@ export default function Products() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-      setShowForm(false);
-      setFormData({
-        sku: "",
-        name: "",
-        description: "",
-        costPrice: "",
-        sellingPrice: "",
-        stockQuantity: 0,
-        reorderLevel: 10,
-        unit: "pcs",
-      });
+      closeForm();
     },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: typeof formData }) => {
+      const res = await apiRequest("PATCH", `/api/products/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      closeForm();
+    },
+  });
+
+  const openEditForm = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      sku: product.sku,
+      name: product.name,
+      description: product.description || "",
+      costPrice: product.costPrice,
+      sellingPrice: product.sellingPrice,
+      stockQuantity: product.stockQuantity,
+      reorderLevel: product.reorderLevel,
+      unit: product.unit,
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingProduct(null);
+    setFormData({
+      sku: "",
+      name: "",
+      description: "",
+      costPrice: "",
+      sellingPrice: "",
+      stockQuantity: 0,
+      reorderLevel: 10,
+      unit: "pcs",
+    });
+  };
 
   const filteredProducts = products.filter(
     (p) =>
@@ -97,11 +129,17 @@ export default function Products() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add Product</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {editingProduct ? "Edit Product" : "Add Product"}
+            </h2>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                createMutation.mutate(formData);
+                if (editingProduct) {
+                  updateMutation.mutate({ id: editingProduct.id, data: formData });
+                } else {
+                  createMutation.mutate(formData);
+                }
               }}
               className="space-y-4"
             >
@@ -194,7 +232,7 @@ export default function Products() {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={closeForm}
                   className="flex-1 px-4 py-2 border rounded-lg hover:bg-muted"
                 >
                   Cancel
@@ -233,6 +271,9 @@ export default function Products() {
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium">
                   Status
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -280,12 +321,20 @@ export default function Products() {
                       {product.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => openEditForm(product)}
+                      className="p-2 hover:bg-muted rounded"
+                    >
+                      <Edit2 className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </td>
                 </tr>
               ))}
               {filteredProducts.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
                     No products found
