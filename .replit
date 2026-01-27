@@ -53,3 +53,6 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-b41f6aad-208b-409d-a252-f96547130a89"

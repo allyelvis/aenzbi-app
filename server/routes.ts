@@ -198,6 +198,16 @@ export function registerRoutes(app: Express) {
     }
   });
 
+  app.patch("/api/expenses/:id", async (req, res) => {
+    try {
+      const expense = await storage.updateExpense(parseInt(req.params.id), req.body);
+      if (!expense) return res.status(404).json({ error: "Expense not found" });
+      res.json(expense);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update expense" });
+    }
+  });
+
   // Tasks
   app.get("/api/tasks", async (req, res) => {
     try {

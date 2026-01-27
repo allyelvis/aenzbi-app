@@ -42,6 +42,7 @@ export interface IStorage {
   // Expenses
   getExpenses(): Promise<Expense[]>;
   createExpense(expense: InsertExpense): Promise<Expense>;
+  updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined>;
 
   // Tasks
   getTasks(): Promise<Task[]>;
@@ -157,6 +158,11 @@ export class DatabaseStorage implements IStorage {
   async createExpense(expense: InsertExpense): Promise<Expense> {
     const [newExpense] = await db.insert(expenses).values(expense).returning();
     return newExpense;
+  }
+
+  async updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined> {
+    const [updated] = await db.update(expenses).set(expense).where(eq(expenses.id, id)).returning();
+    return updated || undefined;
   }
 
   // Tasks
