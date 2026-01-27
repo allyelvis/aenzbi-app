@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, User, Building, DollarSign } from "lucide-react";
+import { Plus, Search, User, Building, DollarSign, Edit2 } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { formatCurrency, formatDate } from "../lib/utils";
 
@@ -30,6 +30,7 @@ const statusColors: Record<string, string> = {
 export default function Leads() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -57,19 +58,50 @@ export default function Leads() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
-      setShowForm(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        source: "",
-        status: "new",
-        expectedValue: "",
-        notes: "",
-      });
+      closeForm();
     },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: typeof formData }) => {
+      const res = await apiRequest("PATCH", `/api/leads/${id}`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      closeForm();
+    },
+  });
+
+  const openEditForm = (lead: Lead) => {
+    setEditingLead(lead);
+    setFormData({
+      name: lead.name,
+      email: lead.email || "",
+      phone: lead.phone || "",
+      company: lead.company || "",
+      source: lead.source || "",
+      status: lead.status,
+      expectedValue: lead.expectedValue || "",
+      notes: lead.notes || "",
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingLead(null);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
+      source: "",
+      status: "new",
+      expectedValue: "",
+      notes: "",
+    });
+  };
 
   const filteredLeads = leads.filter(
     (l) =>
@@ -117,11 +149,17 @@ export default function Leads() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add Lead</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {editingLead ? "Edit Lead" : "Add Lead"}
+            </h2>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                createMutation.mutate(formData);
+                if (editingLead) {
+                  updateMutation.mutate({ id: editingLead.id, data: formData });
+                } else {
+                  createMutation.mutate(formData);
+                }
               }}
               className="space-y-4"
             >
@@ -212,7 +250,7 @@ export default function Leads() {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={closeForm}
                   className="flex-1 px-4 py-2 border rounded-lg hover:bg-muted"
                 >
                   Cancel
@@ -221,7 +259,7 @@ export default function Leads() {
                   type="submit"
                   className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90"
                 >
-                  Save
+                  {editingLead ? "Update" : "Save"}
                 </button>
               </div>
             </form>
@@ -246,10 +284,14 @@ export default function Leads() {
                   <div
                     key={lead.id}
                     className="bg-card border rounded-lg p-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => openEditForm(lead)}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium text-sm">{lead.name}</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium text-sm">{lead.name}</span>
+                      </div>
+                      <Edit2 className="h-3 w-3 text-muted-foreground" />
                     </div>
                     {lead.company && (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">

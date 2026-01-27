@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search, Receipt, Calendar } from "lucide-react";
+import { Plus, Search, Receipt, Calendar, Edit2 } from "lucide-react";
 import { apiRequest } from "../lib/queryClient";
 import { formatCurrency, formatDate } from "../lib/utils";
 
@@ -24,6 +24,7 @@ const statusColors: Record<string, string> = {
 export default function Expenses() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [search, setSearch] = useState("");
   const [formData, setFormData] = useState({
     description: "",
@@ -51,16 +52,47 @@ export default function Expenses() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
-      setShowForm(false);
-      setFormData({
-        description: "",
-        amount: "",
-        category: "",
-        date: new Date().toISOString().split("T")[0],
-        status: "pending",
-      });
+      closeForm();
     },
   });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: typeof formData }) => {
+      const res = await apiRequest("PATCH", `/api/expenses/${id}`, {
+        ...data,
+        date: new Date(data.date),
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses"] });
+      closeForm();
+    },
+  });
+
+  const openEditForm = (expense: Expense) => {
+    setEditingExpense(expense);
+    setFormData({
+      description: expense.description,
+      amount: expense.amount,
+      category: expense.category || "",
+      date: expense.date.split("T")[0],
+      status: expense.status,
+    });
+    setShowForm(true);
+  };
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingExpense(null);
+    setFormData({
+      description: "",
+      amount: "",
+      category: "",
+      date: new Date().toISOString().split("T")[0],
+      status: "pending",
+    });
+  };
 
   const filteredExpenses = expenses.filter((e) =>
     e.description.toLowerCase().includes(search.toLowerCase())
@@ -129,11 +161,17 @@ export default function Expenses() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add Expense</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {editingExpense ? "Edit Expense" : "Add Expense"}
+            </h2>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                createMutation.mutate(formData);
+                if (editingExpense) {
+                  updateMutation.mutate({ id: editingExpense.id, data: formData });
+                } else {
+                  createMutation.mutate(formData);
+                }
               }}
               className="space-y-4"
             >
@@ -177,10 +215,24 @@ export default function Expenses() {
                 }
                 className="w-full px-4 py-2 border rounded-lg"
               />
+              {editingExpense && (
+                <select
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="reimbursed">Reimbursed</option>
+                </select>
+              )}
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={closeForm}
                   className="flex-1 px-4 py-2 border rounded-lg hover:bg-muted"
                 >
                   Cancel
@@ -189,7 +241,7 @@ export default function Expenses() {
                   type="submit"
                   className="flex-1 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90"
                 >
-                  Save
+                  {editingExpense ? "Update" : "Save"}
                 </button>
               </div>
             </form>
@@ -218,6 +270,9 @@ export default function Expenses() {
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium">
                   Status
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium">
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -253,12 +308,20 @@ export default function Expenses() {
                       {expense.status}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => openEditForm(expense)}
+                      className="p-2 hover:bg-muted rounded"
+                    >
+                      <Edit2 className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </td>
                 </tr>
               ))}
               {filteredExpenses.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
                     No expenses found
