@@ -49,6 +49,16 @@ export interface IStorage {
   createTask(task: InsertTask): Promise<Task>;
   updateTask(id: number, task: Partial<InsertTask>): Promise<Task | undefined>;
 
+  // Suppliers
+  getSuppliers(): Promise<Supplier[]>;
+  createSupplier(supplier: InsertSupplier): Promise<Supplier>;
+  updateSupplier(id: number, supplier: Partial<InsertSupplier>): Promise<Supplier | undefined>;
+
+  // Purchase Orders
+  getPurchaseOrders(): Promise<PurchaseOrder[]>;
+  createPurchaseOrder(order: InsertPurchaseOrder): Promise<PurchaseOrder>;
+  updatePurchaseOrder(id: number, order: Partial<InsertPurchaseOrder>): Promise<PurchaseOrder | undefined>;
+
   // Dashboard stats
   getDashboardStats(): Promise<any>;
 }
